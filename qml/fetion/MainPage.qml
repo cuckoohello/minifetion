@@ -109,7 +109,7 @@ Page{
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 16
-            source: "/home/user/.fetion/icons/default.jpg"
+            source: "images/default.jpg"
             width: 55
             height: 55
             smooth:true

@@ -114,7 +114,7 @@ QVariant QFetionContacts::data(const QModelIndex &index, int role) const
         if (QFile(file).exists())
             return file;
         else
-            return QString("/home/user/.fetion/icons/default.jpg");
+            return QString("images/default.jpg");
         break;
     case ShowRole:
         return  groupsList[contact.groupId].show;
