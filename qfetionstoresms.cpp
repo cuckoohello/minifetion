@@ -24,6 +24,7 @@ void QFetionStoreSMS::initialFetionStoreSMS()
     if(!isInitialed)
     {
         QHash<int, QByteArray> roleNames;
+        limit   = 20;
 
         roleNames[DateRole] = "date";
         roleNames[StatusRole] = "status";
@@ -86,8 +87,8 @@ QVariant QFetionStoreSMS::data(const QModelIndex &index, int role ) const {
 
 
 void    QFetionStoreSMS::queryMessages(){
-    QString messageQuery("select message,updatetime,issend  from history where userid='");
-    messageQuery.append(uid).append("' order by updatetime desc limit 20;");
+    QString messageQuery("select id,message,updatetime,issend  from history where userid='");
+    messageQuery.append(uid).append("' order by updatetime desc limit ").append(QString::number(limit));
     qDebug() << messageQuery;
     if(!query.exec(messageQuery))
         qDebug() <<"message query "<<messageQuery<<" error";
@@ -95,7 +96,7 @@ void    QFetionStoreSMS::queryMessages(){
     messageList.clear();
     while(query.next())
     {
-        messageList.insert(0,QFetionMessage(query.value(0).toString(),query.value(1).toString(),query.value(2).toInt()));
+        messageList.insert(0,QFetionMessage(query.value(0).toInt(),query.value(1).toString(),query.value(2).toString(),query.value(3).toInt()));
     }
     endResetModel();
 }

@@ -14,7 +14,9 @@ struct QFetionMessage{
     QString message;
     QString date;
     int     status;
-    QFetionMessage(QString p_message,QString p_date, int p_status){
+    int     id;
+    QFetionMessage(int p_id,QString p_message,QString p_date, int p_status){
+        id      = p_id;
         message = p_message;
         date    = p_date;
         status  = p_status;
@@ -22,6 +24,10 @@ struct QFetionMessage{
     void setStatus(int p_status)
     {
         status  = p_status;
+    }
+    int getID()
+    {
+        return  id;
     }
 };
 
@@ -31,6 +37,7 @@ class QFetionStoreSMS : public QAbstractListModel
 public:
     explicit QFetionStoreSMS(QObject *parent = 0);
     Q_PROPERTY(QString uid READ getUid WRITE setUid NOTIFY uidChanged)
+    Q_PROPERTY(int  limit READ getLimit WRITE setLimit NOTIFY limitChanged)
 
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
@@ -38,6 +45,8 @@ public:
 
     QString getUid(){ return uid;}
     void setUid(QString p_uid){ uid = p_uid; emit uidChanged();}
+    int getLimit() { return limit;}
+    void setLimit(int p_limit){limit = p_limit; emit limitChanged();}
 
     Q_INVOKABLE int insertMessage(QString name,QString uid,QString message);
     Q_INVOKABLE void upDateMessage(QString id,QString status);
@@ -52,6 +61,7 @@ public:
 signals:
     void uidChanged();
     void initialSignal();
+    void limitChanged();
 
 public slots:
     void queryMessages();
@@ -64,6 +74,7 @@ private:
     QMessageManager *messageManager;
      QSqlQuery  query;
      QString    uid;
+     int        limit;
      bool    isInitialed;
 
 };

@@ -142,6 +142,19 @@ Page{
         placeholderText: "Input Message Here!"
         // Set the minimum height to be 200
         height: Math.max (50, implicitHeight)
+        platformSipAttributes:SipAttributes {
+            actionKeyLabel: "Send"
+            actionKeyEnabled: textinput.text!=""
+        }
+
+        Keys.onReturnPressed: {
+            var messageId = fetionSMSModel.insertMessage(mainPage.accountName,personSMS.uid,textinput.text);
+            mainPage.sendSMS(personSMS.name,messageId,personSMS.cellphone,textinput.text);
+          //  fetionNetwork.sendSMS(mainPage.phonenumber,mainPage.password,personSMS.cellphone,textinput.text);
+            textinput.text = "";
+            textinput.closeSoftwareInputPanel();
+        }
+
     }
     Button {
         id: sendButton
