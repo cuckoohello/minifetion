@@ -8,7 +8,6 @@ Item
     height: forwardarea.height
     //            userphotoarea > nametimearea.height + contentarea.height ? userphotoarea : nametimearea.height + contentarea.height
 
-    property int showPic: 0
 
     MouseArea
     {
@@ -33,9 +32,10 @@ Item
     //        forwardText.width = Math.min(forwardarea.width-40,forwardText.implicitWidth);
     //        forward_middle.width = Math.max(forwardText.width,timeText.implicitWidth)+30;
             if (status)
-                anchors.right = parent.right;
-            else
                 anchors.left = parent.left;
+            else
+                anchors.right = parent.right;
+
 
         }
 
@@ -51,7 +51,7 @@ Item
             anchors.top:parent.top; //anchors.topMargin: 5
             anchors.left: parent.left; anchors.leftMargin: 5
             smooth: true
-            source: "images/topic_box_top.png"
+            source: model.status ? "images/send_message_top.png" : "images/receive_message_top.png"
             fillMode:Image.Stretch
         }
 
@@ -60,7 +60,7 @@ Item
             anchors.top:forward_head.bottom
             anchors.left: parent.left; anchors.leftMargin: 5
             smooth: true
-            source: "images/topic_box_central.png"
+            source: model.status ? "images/send_message_central.png" : "images/receive_message_central.png"
             width: Math.max(forwardText.width,timeText.implicitWidth)+30
             height: forwardText.height + timeText.height
             fillMode:Image.Stretch
@@ -71,7 +71,7 @@ Item
                 anchors.left: parent.left; anchors.leftMargin: 15
                 anchors.top: parent.top;
                 text: body
-                color:"#4e4e4f"
+                color:status ? "black" : "white"
                 smooth:true;
                 horizontalAlignment:Text.AlignLeft
                 font.pointSize: 15
@@ -86,7 +86,8 @@ Item
                 anchors.left: parent.left; anchors.leftMargin: 15
                 anchors.top: forwardText.bottom
                 text:date
-                color: "#646464"
+               // color: "#646464"
+                color : model.status ? "darkgray" : "lightgray"
                 smooth:true;
                 font.pointSize: 13
             }
@@ -96,7 +97,7 @@ Item
             anchors.top:forward_middle.bottom
             anchors.left: parent.left; anchors.leftMargin: 5
             smooth: true
-            source: "images/topic_box_bottom.png"
+            source: model.status ? "images/send_message_bottom.png" : "images/receive_message_bottom.png"
             width: forward_middle.width
             fillMode:Image.Stretch
         }
