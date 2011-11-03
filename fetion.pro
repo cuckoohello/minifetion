@@ -6,6 +6,9 @@ DEPLOYMENTFOLDERS = folder_01
 # Additional import path used to resolve QML modules in Creator's code model
 QML_IMPORT_PATH =
 
+INCLUDEPATH += /usr/include/openfetion/
+INCLUDEPATH += /usr/include/libxml2/
+
 symbian:TARGET.UID3 = 0xEE5CC362
 
 # Smart Installer package's UID
@@ -37,7 +40,22 @@ SOURCES += main.cpp \
     qfetionsms.cpp \
     qfetionnetwork.cpp \
     qfetioncontacts.cpp \
-    qfetionstoresms.cpp
+    qfetionstoresms.cpp \
+    fetion_user.c \
+    fetion_sip.c \
+    fetion_share.c \
+    fetion_message.c \
+    fetion_login.c \
+    fetion_list.c \
+    fetion_history.c \
+    fetion_group.c \
+    fetion_directsms.c \
+    fetion_debug.c \
+    fetion_conversation.c \
+    fetion_contact.c \
+    fetion_connection.c \
+    fetion_config.c \
+    fetion_buddylist.c
 
 # Please do not modify the following two lines. Required for deployment.
 include(qmlapplicationviewer/qmlapplicationviewer.pri)
@@ -57,6 +75,7 @@ HEADERS += \
     qfetionnetwork.h \
     qfetioncontacts.h \
     qfetionstoresms.h
+
 
 
 
