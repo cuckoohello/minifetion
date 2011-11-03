@@ -26,7 +26,44 @@ Page{
 
     FetionContacts{
         id : contacts
+        onContacts_Count_Changed:progressBar.maximumValue = total_contacts_count;
+        onPresence_Count_Changed:progressBar.value = presence_contacts_count;
+        onSync_contacts_finished:contactStatusDialog.close();
     }
+
+    Dialog {
+           id: contactStatusDialog
+           title: Item {
+               id: titleField
+               height: contactStatusDialog.platformStyle.titleBarHeight
+               width: parent.width
+               Image {
+                   id: supplement
+                   source: "image://theme/icon-l-contacts"
+                   height: parent.height - 10
+                   width: 75
+                   fillMode: Image.PreserveAspectFit
+                   anchors.leftMargin: 5
+                   anchors.rightMargin: 5
+               }
+
+               Label {
+                   id: titleLabel
+                   anchors.left: supplement.right
+                   anchors.verticalCenter: titleField.verticalCenter
+                   font.capitalization: Font.MixedCase
+                   color: "white"
+                   text: "Sync Contacts"
+               }
+           }
+
+           content: ProgressBar {
+               id: progressBar
+               width: parent.width
+               minimumValue: 0
+           }
+   }
+
 
     function addAccount(nickname,phone){
        contactList.append(
@@ -36,6 +73,15 @@ Page{
                     });
         Storage.addAccount(nickname,phone);
 
+    }
+
+    function syncContacts(phonenumber,password)
+    {
+        progressBar.maximumValue = 100;
+        progressBar.value = 0;
+        contactStatusDialog.open();
+
+        contacts.sync_contacts(phonenumber,password);
     }
 
     function insertAccount(nickname,phone){
@@ -132,6 +178,7 @@ Page{
                 id: refreshbut
                 anchors.fill: parent
                 onClicked: {
+                    mainPage.syncContacts(mainPage.phonenumber,mainPage.password);
                 }
             }
         }
@@ -270,6 +317,9 @@ Page{
                 onClicked:pageStack.push(Qt.createComponent("AddContact.qml"))
             }
             MenuItem {text: "Sync Contacts";
+                onClicked: {
+                    mainPage.syncContacts(mainPage.phonenumber,mainPage.password);
+                }
             }
             MenuItem {text: "Setting";
                 //anchors.centerIn: parent

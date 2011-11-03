@@ -885,7 +885,7 @@ char* xml_convert(xmlChar* in)
 }
 char* fetion_config_get_city_name(const char* province , const char* city)
 {
-	char path[] = RESOURCE_DIR"city.xml"; 
+        char path[] = "city.xml";
 	xmlChar* res;
 	xmlDocPtr doc;
 	xmlNodePtr node;
@@ -931,7 +931,7 @@ char* fetion_config_get_city_name(const char* province , const char* city)
 
 char* fetion_config_get_province_name(const char* province)
 {
-	char path[] = RESOURCE_DIR"province.xml"; 
+        char path[] = "province.xml";
 	xmlChar* res;
 	xmlDocPtr doc;
 	xmlNodePtr node;

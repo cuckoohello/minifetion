@@ -12,7 +12,6 @@
 
 Q_DECL_EXPORT int main(int argc, char *argv[])
 {
-
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("/home/user/.fetion/data.db");
     if (!db.open()) {

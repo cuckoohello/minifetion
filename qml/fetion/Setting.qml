@@ -70,35 +70,19 @@ Page{
             Column{
                 id: inputline
                 spacing: 10
-                Row{
-                    spacing: 10
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "Nickname:"
-                        font.pixelSize: 26; font.bold: true; color: "black";
-                    }
-                    TextField {
-                        id: nickNameText
-
-                        placeholderText: qsTr("NickName")
-                        inputMethodHints: Qt.ImhNoPredictiveText
-
-                    }
-                }
-
 
                 Row{
                     spacing: 10
                     Text {
                         id: login
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "Account :"
+                        text: "Mobile  :"
                         font.pixelSize: 26; font.bold: true; color: "black";
                     }
                     TextField {
                         id: accountText
 
-                        placeholderText: qsTr("Account")
+                        placeholderText: qsTr("phone number")
                         inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
                     }
                 }
@@ -131,9 +115,10 @@ Page{
                width: logincontent.width - 80
                height: 60
                text: "Save"
-               enabled: (accountText.text!="")&&(nickNameText.text!="")&&(passwordText.text!="")
+               enabled: (accountText.text!="")&&(passwordText.text!="")
                onClicked: {
-                   mainPage.updateAccountSetting(nickNameText.text,accountText.text,passwordText.text);
+                   mainPage.syncContacts(accountText.text,passwordText.text);
+                 //  mainPage.updateAccountSetting(nickNameText.text,accountText.text,passwordText.text);
                    pageStack.pop();
                }
             }

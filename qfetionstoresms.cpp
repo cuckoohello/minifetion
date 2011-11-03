@@ -121,6 +121,7 @@ int  QFetionStoreSMS::insertMessage(QString name, QString uid, QString message)
         return query.value(0).toInt();
     }else
         qDebug() <<"Error message id return";
+    return -1;
 }
 
 void  QFetionStoreSMS::upDateMessage(QString id,QString status)
@@ -139,7 +140,6 @@ void	QFetionStoreSMS::messageAdded ( const QMessageId & id, const QMessageManage
 {
 
     QMessage message = messageManager->message(id);
-    bool found = false;
     QString from = message.from().addressee();
 
     if (from.startsWith("12520"))

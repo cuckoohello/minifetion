@@ -7,6 +7,13 @@
 #include <QSqlQuery>
 #include <QDeclarativeParserStatus>
 #include <QHash>
+#include <openfetion.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 struct QFetionContact{
     QString  sid;
@@ -43,6 +50,8 @@ class QFetionContacts : public QAbstractListModel,public QDeclarativeParserStatu
     Q_PROPERTY(QString nickname READ getNickname)
     Q_PROPERTY(QString  password READ getPassword)
     Q_PROPERTY(QString  mobileno READ  getMobileNo)
+    Q_PROPERTY(int total_contacts_count READ getTotalContactsCount NOTIFY contacts_Count_Changed);
+    Q_PROPERTY(int presence_contacts_count READ getPresenceCount NOTIFY presence_Count_Changed);
 
 public:
     explicit QFetionContacts(QObject *parent = 0);
@@ -50,6 +59,8 @@ public:
     QString getNickname(){return nickname;}
     QString getPassword(){return password;}
     QString getMobileNo(){return mobileno;}
+    int getTotalContactsCount(){return total_contacts;}
+    int getPresenceCount() { return presence_count;}
 
     virtual void classBegin();
     virtual void componentComplete();
@@ -68,6 +79,12 @@ public:
     Q_INVOKABLE bool getGroupVisible(int groupid){
         return groupsList[groupid].show;
     }
+    Q_INVOKABLE bool sync_contacts(QString mobileno,QString password)
+    {
+        int ret = fx_login(mobileno.toUtf8().data(),password.toUtf8().data());
+        emit sync_contacts_finished();
+        return ret;
+    }
 
     enum Roles {
         NameRole = Qt::DisplayRole,
@@ -80,8 +97,30 @@ public:
         ShowRole
     };
 
+
+protected:
+    void fx_process_presence(User* user , const char* xml);
+    void fx_process_notifications(User* user , const char* sipmsg);
+    void* fx_listen_func(User* user);
+    int fx_login(const char *mobileno, const char *password);
+    void setTotalContacts(int num)
+    {
+        total_contacts = num;
+        if(total_contacts != 0)
+            emit contacts_Count_Changed();
+    }
+    void incPresenceCount()
+    {
+        presence_count++;
+        emit presence_Count_Changed();
+    }
+
+
 signals:
     void groupShowChanged(int groupid);
+    void sync_contacts_finished();
+    void contacts_Count_Changed();
+    void presence_Count_Changed();
 
 public slots:
     void groupStateChanged(int groupid);
@@ -92,6 +131,12 @@ private:
   //   QSqlQuery query;
      QHash<int,QFetionGroups>   groupsList;
      QString    nickname,password,mobileno;
+
+     User *user;
+
+     int presence_count;
+     fd_set  fd_read;
+     int total_contacts;
 };
 
 #endif // QFETIONCONTACTS_H
