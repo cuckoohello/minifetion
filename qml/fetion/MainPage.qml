@@ -15,6 +15,7 @@ Page{
     property string password
     property string accountName
     property string server  : "http://202.112.3.1/sms/sendsms.php"
+    orientationLock : PageOrientation.LockPortrait
 
 
     Component.onCompleted:

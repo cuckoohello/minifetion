@@ -53,7 +53,19 @@ OTHER_FILES += \
     qtc_packaging/debian_harmattan/copyright \
     qtc_packaging/debian_harmattan/control \
     qtc_packaging/debian_harmattan/compat \
-    qtc_packaging/debian_harmattan/changelog
+    qtc_packaging/debian_harmattan/changelog \
+    qml/fetion/Storage.js \
+    qml/fetion/Network.js \
+    qml/fetion/constants.js \
+    qml/fetion/smsui.qml \
+    qml/fetion/Setting.qml \
+    qml/fetion/PersonSMS.qml \
+    qml/fetion/MainPage.qml \
+    qml/fetion/ContactListDelegate.qml \
+    qml/fetion/AddContact.qml \
+    qml/fetion/AccTitleBar.qml \
+    qml/fetion/AccountSetting.qml \
+    qml/fetion/AccListSina.qml
 
 HEADERS += \
     qfetionsms.h \
@@ -74,3 +86,5 @@ contains(MEEGO_EDITION,harmattan) {
 
     INSTALLS += target icon desktop
 }
+
+

@@ -18,6 +18,8 @@ Page{
 
     property string uid
 
+    orientationLock : PageOrientation.LockPortrait
+
     function showInfoBanner(){
         smsStatusBanner.forceActiveFocus();
         smsStatusBanner.show();
