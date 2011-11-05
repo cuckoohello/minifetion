@@ -6,23 +6,27 @@
 QFetionStoreSMS::QFetionStoreSMS(QObject *parent) :
     QAbstractListModel(parent)
 {
-
-    if(!query.exec("create table  IF NOT EXISTS  history (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,userid TEXT,message TEXT,updatetime TEXT,issend INTEGER)"))
-        qDebug() << "create history table error!";
     isInitialed = false;
-  //  connect(this,SIGNAL(initialSignal()),this,SLOT(initialFetionStoreSMS()));
-    initialFetionStoreSMS();
+    smsThread = new QFetionStoreSMSThread(this);
+    connect(this,SIGNAL(doThread(QFetionStoreSMS::DoThread)),smsThread,SLOT(doThread(QFetionStoreSMS::DoThread)));
+    smsThread->start();
+  //  usleep(1000);
+  //  emit doThread(QFetionStoreSMS::InitialClass);
+
 }
 
 void QFetionStoreSMS::initial()
 {
-    emit    initialSignal();
+    emit doThread(QFetionStoreSMS::InitialClass);
 }
 
-void QFetionStoreSMS::initialFetionStoreSMS()
+void QFetionStoreSMS::initialClass()
 {
     if(!isInitialed)
     {
+        if(!query.exec("create table  IF NOT EXISTS  history (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,userid TEXT,message TEXT,updatetime TEXT,issend INTEGER)"))
+            qDebug() << "create history table error!";
+
         QHash<int, QByteArray> roleNames;
         limit   = 20;
 

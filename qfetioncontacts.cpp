@@ -15,6 +15,19 @@ QFetionContacts::QFetionContacts(QObject *parent) :
     roleNames[ShowRole] = "show";
     setRoleNames(roleNames);
 
+
+    contactThread = new QFetionContactThread(this);
+    //connect(this,SIGNAL(doThread(QFetionContacts::DoThread)),contactThread,SLOT(doThread(QFetionContacts::DoThread)),Qt::QueuedConnection);
+    connect(this,SIGNAL(doThread(QFetionContacts::DoThread)),contactThread,SLOT(doThread(QFetionContacts::DoThread)));
+    contactThread->start();
+    initial_contacts();
+    //usleep(500);
+    //emit doThread(InitialContacts);
+
+}
+
+void QFetionContacts::initial_contacts()
+{
     QSqlQuery query;
     QSqlQuery queryContacts;
 
@@ -32,6 +45,7 @@ QFetionContacts::QFetionContacts(QObject *parent) :
     if(!query.exec("select * from groups order by groupid"))
         qDebug() <<"Select from groups error!";
 
+    beginResetModel();
     while(query.next())
     {
         groupId = query.value(0).toInt();
@@ -50,6 +64,7 @@ QFetionContacts::QFetionContacts(QObject *parent) :
                                                queryContacts.value(4).toString(),groupId));
         }
     }
+    endResetModel();
 
     connect(this,SIGNAL(groupShowChanged(int)),this,SLOT(groupStateChanged(int)));
 }

@@ -21,7 +21,7 @@ Page{
         phonenumber = contacts.mobileno;
         password    = contacts.password;
         accountName = contacts.nickname;
-    //    personSMSPage.initial();
+        personSMSPage.initial();
     }
 
     FetionContacts{
@@ -65,16 +65,6 @@ Page{
    }
 
 
-    function addAccount(nickname,phone){
-       contactList.append(
-                    {
-                        title : nickname,
-                        subtitle : phone
-                    });
-        Storage.addAccount(nickname,phone);
-
-    }
-
     function syncContacts(phonenumber,password)
     {
         progressBar.maximumValue = 100;
@@ -84,28 +74,9 @@ Page{
         contacts.sync_contacts(phonenumber,password);
     }
 
-    function insertAccount(nickname,phone){
-        contactList.append(
-                     {
-                         title : nickname,
-                         subtitle : phone
-                     });
-    }
-
-
-    function updateAccountSetting(nickname,phone,password) {
-        Storage.setSetting("phonenumber",phone);
-        Storage.setSetting("password",password);
-        Storage.setSetting("accountName",nickname)
-        phonenumber = phone;
-        password = password;
-        accountName = nickname;
-    }
-
-
-    function sendSMS(sendto,id,cellphone,message)
+    function sendSMS(sendto,messageid,cellphone,message)
     {
-        Network.sendSMS(server,phonenumber,password,sendto,cellphone,message,id,callback);
+        Network.sendSMS(server,phonenumber,password,sendto,cellphone,message,messageid,callback);
     }
 
     function  callback(status,sendto,id,log)
@@ -139,9 +110,6 @@ Page{
     PersonSMS{
         id : personSMSPage
     }
-
-
-
 
     AccTitleBar{
         id: mainPageTitle
@@ -209,7 +177,6 @@ Page{
         delegate: ContactListDelegate{
             id : listdelegate
             onClicked: {
-           //     personSMSPage.initial();
                 personSMSPage.cellphone = phone;
                 personSMSPage.name = name;
                 personSMSPage.image_url = image;
@@ -327,6 +294,5 @@ Page{
             }
         }
     }
-
 
 }

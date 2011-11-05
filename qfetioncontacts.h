@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <QWaitCondition>
+#include <QMutex>
+#include <QThread>
 
 struct QFetionContact{
     QString  sid;
@@ -41,6 +44,8 @@ struct  QFetionGroups{
     }
 };
 
+
+class QFetionContactThread;
 
 class QFetionContacts : public QAbstractListModel,public QDeclarativeParserStatus
 {
@@ -79,11 +84,11 @@ public:
     Q_INVOKABLE bool getGroupVisible(int groupid){
         return groupsList[groupid].show;
     }
-    Q_INVOKABLE bool sync_contacts(QString mobileno,QString password)
+    Q_INVOKABLE void sync_contacts(QString mobileno,QString password)
     {
-        int ret = fx_login(mobileno.toUtf8().data(),password.toUtf8().data());
-        emit sync_contacts_finished();
-        return ret;
+        sync_mobileno = mobileno; sync_password = password;
+        emit doThread(SyncContacts);
+
     }
 
     enum Roles {
@@ -95,6 +100,11 @@ public:
         UserIdRole,
         ImageRole,
         ShowRole
+    };
+
+    enum DoThread{
+        InitialContacts,
+        SyncContacts
     };
 
 
@@ -115,12 +125,23 @@ protected:
         emit presence_Count_Changed();
     }
 
+    bool sync_contacts(){
+        int ret = fx_login(sync_mobileno.toUtf8().data(),sync_password.toUtf8().data());
+        emit sync_contacts_finished();
+        qDebug() <<"Sync ended!";
+        return ret;
+
+    }
+
+    void initial_contacts();
+
 
 signals:
     void groupShowChanged(int groupid);
     void sync_contacts_finished();
     void contacts_Count_Changed();
     void presence_Count_Changed();
+    void doThread(QFetionContacts::DoThread id);
 
 public slots:
     void groupStateChanged(int groupid);
@@ -131,12 +152,50 @@ private:
   //   QSqlQuery query;
      QHash<int,QFetionGroups>   groupsList;
      QString    nickname,password,mobileno;
+     QString    sync_mobileno,sync_password;
 
      User *user;
 
      int presence_count;
      fd_set  fd_read;
      int total_contacts;
+     QFetionContactThread* contactThread;
+     friend class QFetionContactThread;
+};
+
+
+class QFetionContactThread:public QThread{
+    Q_OBJECT
+public:
+   // NumThread(QObject *parent=0):QThread(parent){}
+    QFetionContactThread(QFetionContacts *p_contacts){contacts= p_contacts;mutex.lock();}
+    void run(){
+        forever{
+            waitCondition.wait(&mutex);
+            QFetionContacts::DoThread id = threadid;
+            qDebug() <<"in run contact thread "<<id;
+            switch(id){
+            case QFetionContacts::SyncContacts:
+                contacts->sync_contacts();
+                break;
+            case QFetionContacts::InitialContacts:
+                contacts->initial_contacts();
+            }
+        }
+    };
+
+public slots:
+    void doThread(QFetionContacts::DoThread id ){
+        threadid = id;
+        waitCondition.wakeAll();
+    }
+
+
+private:
+    QFetionContacts::DoThread threadid;
+    QFetionContacts* contacts;
+    QWaitCondition waitCondition;
+    QMutex mutex;
 };
 
 #endif // QFETIONCONTACTS_H
