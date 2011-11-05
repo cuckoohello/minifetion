@@ -20,9 +20,9 @@ QFetionContacts::QFetionContacts(QObject *parent) :
     //connect(this,SIGNAL(doThread(QFetionContacts::DoThread)),contactThread,SLOT(doThread(QFetionContacts::DoThread)),Qt::QueuedConnection);
     connect(this,SIGNAL(doThread(QFetionContacts::DoThread)),contactThread,SLOT(doThread(QFetionContacts::DoThread)));
     contactThread->start();
-    initial_contacts();
-    //usleep(500);
-    //emit doThread(InitialContacts);
+    //initial_contacts();
+    usleep(500);
+    emit doThread(InitialContacts);
 
 }
 
@@ -103,7 +103,7 @@ QVariant QFetionContacts::data(const QModelIndex &index, int role) const
         return QString();
     QFetionContact  contact = contactsList.at(index.row());
 
-    QString file("file:/home/user/.fetion/icons/");
+    QString file("/home/user/.fetion/icons/");
     switch(role)
     {
     case NameRole:
@@ -127,7 +127,7 @@ QVariant QFetionContacts::data(const QModelIndex &index, int role) const
     case ImageRole:
         file.append(contact.sid).append(".jpg");
         if (QFile(file).exists())
-            return file;
+            return file.insert(0,"file:");
         else
             return QString("images/default.jpg");
         break;

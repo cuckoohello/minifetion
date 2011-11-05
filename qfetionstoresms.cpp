@@ -10,15 +10,18 @@ QFetionStoreSMS::QFetionStoreSMS(QObject *parent) :
     smsThread = new QFetionStoreSMSThread(this);
     connect(this,SIGNAL(doThread(QFetionStoreSMS::DoThread)),smsThread,SLOT(doThread(QFetionStoreSMS::DoThread)));
     smsThread->start();
+    messageManager = new QMessageManager(this);
+    connect(messageManager,SIGNAL(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)),this,SLOT(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)));
+    messageManager->registerNotificationFilter(QMessageFilter());
   //  usleep(1000);
   //  emit doThread(QFetionStoreSMS::InitialClass);
-    initialClass();
+  //  initialClass();
 
 }
 
 void QFetionStoreSMS::initial()
 {
- //   emit doThread(QFetionStoreSMS::InitialClass);
+    emit doThread(QFetionStoreSMS::InitialClass);
 }
 
 void QFetionStoreSMS::initialClass()
@@ -37,9 +40,7 @@ void QFetionStoreSMS::initialClass()
         setRoleNames(roleNames);
 
         connect(this,SIGNAL(uidChanged()),this,SLOT(queryMessages()));
-        messageManager = new QMessageManager(this);
-        connect(messageManager,SIGNAL(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)),this,SLOT(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)));
-        messageManager->registerNotificationFilter(QMessageFilter());
+
         isInitialed = true;
     }
 }
@@ -143,6 +144,7 @@ void  QFetionStoreSMS::upDateMessage(QString id,QString status)
 
 void	QFetionStoreSMS::messageAdded ( const QMessageId & id, const QMessageManager::NotificationFilterIdSet & matchingFilterIds )
 {
+    qDebug() << "message added ";
 
     QMessage message = messageManager->message(id);
     QString from = message.from().addressee();
