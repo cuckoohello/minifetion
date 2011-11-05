@@ -159,7 +159,7 @@ void generate_pic_code(User *user)
 	pic = decode_base64(code , &piclen);
 	free(code);
 	memset(codePath, 0, sizeof(codePath));
-	sprintf(codePath , "%s/code.gif" , user->config->globalPath);
+        sprintf(codePath , "%s/code.jpeg" , user->config->globalPath);
 	picfd = fopen(codePath , "wb+");
 	n = 0;
 	for(; n != piclen ;){

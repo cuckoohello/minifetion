@@ -95,6 +95,11 @@ public:
         emit doThread(SyncContacts);
 
     }
+    Q_INVOKABLE void setAuthCode(QString p_authCode)
+    {
+        authCode = p_authCode;
+        waitCondition.wakeAll();
+    }
 
     enum Roles {
         NameRole = Qt::DisplayRole,
@@ -146,6 +151,7 @@ signals:
     void presence_Count_Changed();
     void doThread(QFetionContacts::DoThread id);
     void sync_Status_Changed();
+    void sync_need_auth();
 
 public slots:
     void groupStateChanged(int groupid);
@@ -158,6 +164,9 @@ private:
      QString    nickname,password,mobileno;
      QString    sync_mobileno,sync_password;
      QString sync_status_message;
+     QMutex mutex;
+     QWaitCondition waitCondition;
+     QString authCode;
 
      User *user;
 

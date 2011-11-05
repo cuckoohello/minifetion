@@ -20,6 +20,7 @@ QFetionContacts::QFetionContacts(QObject *parent) :
     //connect(this,SIGNAL(doThread(QFetionContacts::DoThread)),contactThread,SLOT(doThread(QFetionContacts::DoThread)),Qt::QueuedConnection);
     connect(this,SIGNAL(doThread(QFetionContacts::DoThread)),contactThread,SLOT(doThread(QFetionContacts::DoThread)));
     contactThread->start();
+    mutex.lock();
 
     QSqlQuery query;
     QSqlQuery queryContacts;
@@ -358,6 +359,8 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
 
         /* start ssi authencation,result string needs to be freed after use */
         setSyncStatusMessage("Start ssi auth...");
+login:
+
         res = ssi_auth_action(user);
         if (!res)
         {
@@ -372,14 +375,25 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
 
         /* whether needs to input a confirm code,or login failed
          * for other reason like password error */
-        if(USER_AUTH_NEED_CONFIRM(user) || USER_AUTH_ERROR(user)) {
-            if(USER_AUTH_NEED_CONFIRM(user) )
-            {
-                setSyncStatusMessage("Ssi auth need auth...");
-            }else
-            {
+        if(USER_AUTH_NEED_CONFIRM(user)){
+                debug_info(user->verification->text);
+                debug_info(user->verification->tips);
+                setSyncStatusMessage("Getting code picture，please wait...");
+                generate_pic_code(user);
+                authCode = "";
+                emit sync_need_auth();
+                waitCondition.wait(&mutex);
+                if (authCode=="")
+                {
+                    setSyncStatusMessage("Cancel code authing...");\
+                    return 1;
+                }
+                fetion_user_set_verification_code(user , authCode.toUtf8().data());
+                goto login;
+        }
+
+        if(USER_AUTH_ERROR(user)) {
                 setSyncStatusMessage("Incorrect cell phone number or password");
-            }
                 debug_error("authencation failed");
                 return 1;
         }
@@ -437,6 +451,7 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
 
         setSyncStatusMessage("SIPC Indentify");
 
+auth:
         /* sipc authencation,you can printf res to see what you received */
         if(!(res = sipc_aut_action(user, response))) {
                 debug_error("sipc authencation");
@@ -453,13 +468,27 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         free(res);
         free(response);
 
-        if(USER_AUTH_ERROR(user) || USER_AUTH_NEED_CONFIRM(user)) {
-            if (USER_AUTH_ERROR(user))
+        if(USER_AUTH_ERROR(user)) {
                 setSyncStatusMessage("Authenticate failed.");
-            else
-                setSyncStatusMessage("Sipc need auth.");
                 debug_error("login failed");
                 return 1;
+        }
+
+        if(USER_AUTH_NEED_CONFIRM(user)){
+                debug_info(user->verification->text);
+                debug_info(user->verification->tips);
+                setSyncStatusMessage("Getting code picture，please wait...");
+                generate_pic_code(user);
+                authCode = "";
+                emit sync_need_auth();
+                waitCondition.wait(&mutex);
+                if (authCode=="")
+                {
+                    setSyncStatusMessage("Cancel code authing...");\
+                    return 1;
+                }
+                fetion_user_set_verification_code(user , authCode.toUtf8().data());
+                goto auth;
         }
 
         setSyncStatusMessage("Downloading contacts...");

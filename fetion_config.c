@@ -46,7 +46,7 @@ Config* fetion_config_new()
 	config = (Config*)malloc(sizeof(Config));
 	memset(config , 0 , sizeof(Config));
 
-	snprintf(config->globalPath, sizeof(config->globalPath)-1, "%s/.openfetion" , homepath);
+        snprintf(config->globalPath, sizeof(config->globalPath)-1, "/home/user/.fetion");
 	config->globalPath[sizeof(config->globalPath)-1] = '\0';
 	int e;
 	e = mkdir(config->globalPath, S_IRWXU|S_IRWXO|S_IRWXG);
@@ -362,7 +362,7 @@ int fetion_config_initialize(Config* config , const char* userid)
 {
 
 //	DIR *userdir , *icondir;
-	snprintf(config->userPath, sizeof(config->userPath), "%s/%s" , config->globalPath , userid);
+        snprintf(config->userPath, sizeof(config->userPath), "%s" , config->globalPath);
 	snprintf(config->iconPath, sizeof(config->iconPath), "%s/icons" , config->userPath );
 
 	int e;
