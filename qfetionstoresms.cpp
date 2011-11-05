@@ -12,12 +12,13 @@ QFetionStoreSMS::QFetionStoreSMS(QObject *parent) :
     smsThread->start();
   //  usleep(1000);
   //  emit doThread(QFetionStoreSMS::InitialClass);
+    initialClass();
 
 }
 
 void QFetionStoreSMS::initial()
 {
-    emit doThread(QFetionStoreSMS::InitialClass);
+ //   emit doThread(QFetionStoreSMS::InitialClass);
 }
 
 void QFetionStoreSMS::initialClass()

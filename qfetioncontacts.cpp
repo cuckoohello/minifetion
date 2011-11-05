@@ -103,7 +103,7 @@ QVariant QFetionContacts::data(const QModelIndex &index, int role) const
         return QString();
     QFetionContact  contact = contactsList.at(index.row());
 
-    QString file("/home/user/.fetion/icons/");
+    QString file("file:/home/user/.fetion/icons/");
     switch(role)
     {
     case NameRole:

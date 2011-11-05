@@ -1,11 +1,12 @@
 #include <QtGui/QApplication>
-#include "qmlapplicationviewer.h"
 #include <qdeclarative.h>
 #include <QDeclarativeView>
 #include <QDeclarativeEngine>
 #include "qfetionsms.h"
 #include "qfetioncontacts.h"
 #include "qfetionstoresms.h"
+#include "fpsdeclarativeview.h"
+#include <QDir>
 //#include "qfetionnetwork.h"
 
 #include <QSqlDatabase>
@@ -21,16 +22,23 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     //  qmlRegisterType<QFetionSMS>("com.cuckoo.fetion", 1, 0, "FetionSMSModel");
       qmlRegisterType<QFetionContacts>("com.cuckoo.fetion", 1, 0, "FetionContacts");
       qmlRegisterType<QFetionStoreSMS>("com.cuckoo.fetion",1,0,"FetionSMSModel");
+      QApplication app(argc, argv);
    //   qmlRegisterType<QFetionNetwork>("com.cuckoo.fetion",1,0,"FetionNetwork");
-    QScopedPointer<QApplication> app(createApplication(argc, argv));
-    QScopedPointer<QmlApplicationViewer> viewer(QmlApplicationViewer::create());
 
-    viewer->engine()->setOfflineStoragePath("/home/user/.local/share//data///QML/OfflineStorage");
- //   qDebug() << viewer->engine()->offlineStoragePath();
+      QDir::setCurrent(app.applicationDirPath());
+      FPSDeclarativeView window;
+      window.setSource(QUrl("qrc:/smsui.qml"));
 
-    viewer->setOrientation(QmlApplicationViewer::ScreenOrientationAuto);
-    viewer->setMainQmlFile(QLatin1String("qml/fetion/smsui.qml"));
-    viewer->showExpanded();
+  #ifndef Q_WS_MACX
+      window.showFullScreen();
+  #else
+      window.show();
+  #endif
 
-    return app->exec();
+  #ifndef __arm__
+        window.resize(window.initialSize().width(), window.initialSize().height());
+  #endif
+
+
+    return app.exec();
 }

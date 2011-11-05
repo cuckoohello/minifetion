@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/">
+        <file>AccListSina.qml</file>
+        <file>AccountSetting.qml</file>
+        <file>AccTitleBar.qml</file>
+        <file>AddContact.qml</file>
+        <file>constants.js</file>
+        <file>ContactListDelegate.qml</file>
+        <file>MainPage.qml</file>
+        <file>Network.js</file>
+        <file>PersonSMS.qml</file>
+        <file>qmlfiles.qrc</file>
+        <file>Setting.qml</file>
+        <file>smsui.qml</file>
+        <file>Storage.js</file>
+        <file>images/account.png</file>
+        <file>images/default.jpg</file>
+        <file>images/down.png</file>
+        <file>images/mask_userimage.png</file>
+        <file>images/mask_userimage_blue.png</file>
+        <file>images/mask_userimage_gradientbg.png</file>
+        <file>images/receive_message_bottom.png</file>
+        <file>images/receive_message_central.png</file>
+        <file>images/receive_message_top.png</file>
+        <file>images/refresh.png</file>
+        <file>images/refresh_blue.png</file>
+        <file>images/refresh_press.png</file>
+        <file>images/refresh_press_blue.png</file>
+        <file>images/refreshtimebg.png</file>
+        <file>images/right.png</file>
+        <file>images/send_message_bottom.png</file>
+        <file>images/send_message_central.png</file>
+        <file>images/send_message_top.png</file>
+        <file>images/titlebg_blue.png</file>
+        <file>images/titlebg_gray.png</file>
+    </qresource>
+</RCC>
