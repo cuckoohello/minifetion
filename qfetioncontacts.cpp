@@ -357,7 +357,14 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         fetion_user_set_config(user, config);
 
         /* start ssi authencation,result string needs to be freed after use */
+        setSyncStatusMessage("Start ssi auth...");
         res = ssi_auth_action(user);
+        if (!res)
+        {
+            setSyncStatusMessage("Login Failed");
+            return 1;
+        }
+
         /* parse the ssi authencation result,if success,user's sipuri and userid
          * are stored in user object,orelse user->loginStatus was marked failed */
         parse_ssi_auth_response(res, user);
@@ -366,6 +373,13 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         /* whether needs to input a confirm code,or login failed
          * for other reason like password error */
         if(USER_AUTH_NEED_CONFIRM(user) || USER_AUTH_ERROR(user)) {
+            if(USER_AUTH_NEED_CONFIRM(user) )
+            {
+                setSyncStatusMessage("Ssi auth need auth...");
+            }else
+            {
+                setSyncStatusMessage("Incorrect cell phone number or password");
+            }
                 debug_error("authencation failed");
                 return 1;
         }
@@ -376,7 +390,9 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
                 return 1;
         }
 
+        setSyncStatusMessage("Downloading configuration files");
         if(fetion_config_download_configuration(user) == -1) {
+            setSyncStatusMessage("Connection has been shutdown by the server");
                 debug_error("download configuration");
                 return 1;
         }
@@ -389,9 +405,11 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         fetion_contact_load(user, &local_group_count, &local_buddy_count);
 
         /* construct a tcp object and connect to the sipc proxy server */
+        setSyncStatusMessage("Connecting to registration server");
         tcp = tcp_connection_new();
         if((ret = tcp_connection_connect(tcp, config->sipcProxyIP, config->sipcProxyPort)) == -1) {
                 debug_error("connect sipc server %s:%d\n", config->sipcProxyIP, config->sipcProxyPort);
+                setSyncStatusMessage("Login failed");
                 return 1;
         }
 
@@ -399,9 +417,12 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         sip = fetion_sip_new(tcp, user->sId);
         fetion_user_set_sip(user, sip);
 
+        setSyncStatusMessage("Registering to SIPC Server");
+
         /* register to sipc server */
         if(!(res = sipc_reg_action(user))) {
                 debug_error("register to sipc server");
+                setSyncStatusMessage("Login failed");
                 return 1;
         }
 
@@ -414,14 +435,18 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         free(key);
         free(aeskey);
 
+        setSyncStatusMessage("SIPC Indentify");
+
         /* sipc authencation,you can printf res to see what you received */
         if(!(res = sipc_aut_action(user, response))) {
                 debug_error("sipc authencation");
+                setSyncStatusMessage("Login failed");
                 return 1;
         }
 
         if(parse_sipc_auth_response(res, user, &group_count, &buddy_count) == -1) {
                 debug_error("authencation failed");
+                setSyncStatusMessage("Authenticate failed.");
                 return 1;
         }
 
@@ -429,28 +454,25 @@ int QFetionContacts::fx_login(const char *mobileno, const char *password)
         free(response);
 
         if(USER_AUTH_ERROR(user) || USER_AUTH_NEED_CONFIRM(user)) {
+            if (USER_AUTH_ERROR(user))
+                setSyncStatusMessage("Authenticate failed.");
+            else
+                setSyncStatusMessage("Sipc need auth.");
                 debug_error("login failed");
                 return 1;
         }
+
+        setSyncStatusMessage("Downloading contacts...");
 
         fetion_contact_subscribe_only(user);
         fx_listen_func(user);
 
 
         /* save the user information and contact list information back to the local database */
+        setSyncStatusMessage("Save contacts");
         fetion_user_save(user);
         fetion_contact_save(user);
 
-        /* these... fuck the fetion protocol */
-        struct timeval tv;
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
-        char buf[1024];
-        if(setsockopt(user->sip->tcp->socketfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) == -1) {
-                debug_error("settimeout");
-                return 1;
-        }
-        tcp_connection_recv(user->sip->tcp, buf, sizeof(buf));
          fetion_user_free(user);
 
         return 0;

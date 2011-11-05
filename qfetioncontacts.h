@@ -57,6 +57,7 @@ class QFetionContacts : public QAbstractListModel,public QDeclarativeParserStatu
     Q_PROPERTY(QString  mobileno READ  getMobileNo)
     Q_PROPERTY(int total_contacts_count READ getTotalContactsCount NOTIFY contacts_Count_Changed);
     Q_PROPERTY(int presence_contacts_count READ getPresenceCount NOTIFY presence_Count_Changed);
+    Q_PROPERTY(QString sync_status_message READ getSyncStatusMessage NOTIFY sync_Status_Changed);
 
 public:
     explicit QFetionContacts(QObject *parent = 0);
@@ -66,6 +67,10 @@ public:
     QString getMobileNo(){return mobileno;}
     int getTotalContactsCount(){return total_contacts;}
     int getPresenceCount() { return presence_count;}
+    QString getSyncStatusMessage() { return sync_status_message;}
+
+    void setSyncStatusMessage(QString p_message){sync_status_message = p_message; emit sync_Status_Changed();}
+
 
     virtual void classBegin();
     virtual void componentComplete();
@@ -126,7 +131,9 @@ protected:
 
     bool sync_contacts(){
         int ret = fx_login(sync_mobileno.toUtf8().data(),sync_password.toUtf8().data());
-        emit sync_contacts_finished();
+        if (ret)
+            sleep(1); // for user to navigate the error!
+        emit sync_contacts_finished(ret);
         qDebug() <<"Sync ended!";
         return ret;
 
@@ -134,10 +141,11 @@ protected:
 
 signals:
     void groupShowChanged(int groupid);
-    void sync_contacts_finished();
+    void sync_contacts_finished(int ret);
     void contacts_Count_Changed();
     void presence_Count_Changed();
     void doThread(QFetionContacts::DoThread id);
+    void sync_Status_Changed();
 
 public slots:
     void groupStateChanged(int groupid);
@@ -149,6 +157,7 @@ private:
      QHash<int,QFetionGroups>   groupsList;
      QString    nickname,password,mobileno;
      QString    sync_mobileno,sync_password;
+     QString sync_status_message;
 
      User *user;
 

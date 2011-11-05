@@ -27,13 +27,17 @@ Page{
 
     FetionContacts{
         id : contacts
-        onContacts_Count_Changed:progressBar.maximumValue = total_contacts_count;
-        onPresence_Count_Changed:progressBar.value = presence_contacts_count;
-        onSync_contacts_finished:contactStatusDialog.close();
+        onContacts_Count_Changed:{
+            progressBar.indeterminate = false;
+        }
+        onSync_contacts_finished:{
+            contactStatusDialog.close();
+        }
     }
 
     Dialog {
            id: contactStatusDialog
+           anchors.centerIn: parent
            title: Item {
                id: titleField
                height: contactStatusDialog.platformStyle.titleBarHeight
@@ -58,20 +62,34 @@ Page{
                }
            }
 
-           content: ProgressBar {
-               id: progressBar
+           content: Item {
                width: parent.width
-               minimumValue: 0
+               ProgressBar {
+                   id: progressBar
+                   width: parent.width
+                   minimumValue: 0
+                   maximumValue : contacts.total_contacts_count
+                   value : contacts.presence_contacts_count
+               }
+
+               Text {
+                   id: text
+                   anchors.top: progressBar.bottom
+                   anchors.topMargin : 10
+                   font.pixelSize: 22
+                   color: "white"
+                   text: contacts.sync_status_message
+                   verticalAlignment: Text.AlignVCenter
+               }
+
            }
    }
 
 
     function syncContacts(phonenumber,password)
     {
-        progressBar.maximumValue = 100;
-        progressBar.value = 0;
+	progressBar.indeterminate = true;
         contactStatusDialog.open();
-
         contacts.sync_contacts(phonenumber,password);
     }
 
@@ -102,7 +120,7 @@ Page{
         timerEnabled:true
         timerShowTime:3000
         topMargin: parent.height/3
-       // leftMargin:
+        z : contactView.z + 1
 
     }
 
