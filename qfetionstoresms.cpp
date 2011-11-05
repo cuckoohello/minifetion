@@ -6,43 +6,26 @@
 QFetionStoreSMS::QFetionStoreSMS(QObject *parent) :
     QAbstractListModel(parent)
 {
-    isInitialed = false;
+  //  messageManager = new QMessageManager(this);
+  //  connect(messageManager,SIGNAL(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)),this,SLOT(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)));
+  //  messageManager->registerNotificationFilter(QMessageFilter());
+
+
+    if(!query.exec("create table  IF NOT EXISTS  history (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,userid TEXT,message TEXT,updatetime TEXT,issend INTEGER)"))
+        qDebug() << "create history table error!";
+
+    QHash<int, QByteArray> roleNames;
+    limit   = 20;
+
+    roleNames[DateRole] = "date";
+    roleNames[StatusRole] = "status";
+    roleNames[MessageRole] = "body";
+    setRoleNames(roleNames);
+
+    connect(this,SIGNAL(uidChanged()),this,SLOT(queryMessages()));
     smsThread = new QFetionStoreSMSThread(this);
-    connect(this,SIGNAL(doThread(QFetionStoreSMS::DoThread)),smsThread,SLOT(doThread(QFetionStoreSMS::DoThread)));
     smsThread->start();
-    messageManager = new QMessageManager(this);
-    connect(messageManager,SIGNAL(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)),this,SLOT(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)));
-    messageManager->registerNotificationFilter(QMessageFilter());
-  //  usleep(1000);
-  //  emit doThread(QFetionStoreSMS::InitialClass);
-  //  initialClass();
 
-}
-
-void QFetionStoreSMS::initial()
-{
-    emit doThread(QFetionStoreSMS::InitialClass);
-}
-
-void QFetionStoreSMS::initialClass()
-{
-    if(!isInitialed)
-    {
-        if(!query.exec("create table  IF NOT EXISTS  history (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,userid TEXT,message TEXT,updatetime TEXT,issend INTEGER)"))
-            qDebug() << "create history table error!";
-
-        QHash<int, QByteArray> roleNames;
-        limit   = 20;
-
-        roleNames[DateRole] = "date";
-        roleNames[StatusRole] = "status";
-        roleNames[MessageRole] = "body";
-        setRoleNames(roleNames);
-
-        connect(this,SIGNAL(uidChanged()),this,SLOT(queryMessages()));
-
-        isInitialed = true;
-    }
 }
 
 

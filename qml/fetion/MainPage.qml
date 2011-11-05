@@ -23,7 +23,6 @@ Page{
         phonenumber = contacts.mobileno;
         password    = contacts.password;
         accountName = contacts.nickname;
-        personSMSPage.initial();
     }
 
     FetionContacts{

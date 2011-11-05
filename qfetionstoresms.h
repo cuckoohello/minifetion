@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QDebug>
 
 
 QTM_USE_NAMESPACE
@@ -34,9 +35,7 @@ struct QFetionMessage{
     }
 };
 
-
 class QFetionStoreSMSThread;
-
 class QFetionStoreSMS : public QAbstractListModel
 {
     Q_OBJECT
@@ -56,7 +55,6 @@ public:
 
     Q_INVOKABLE int insertMessage(QString name,QString uid,QString message);
     Q_INVOKABLE void upDateMessage(QString id,QString status);
-    Q_INVOKABLE void initial();
 
     enum Roles {
         DateRole = Qt::DisplayRole,
@@ -64,16 +62,11 @@ public:
         MessageRole
     };
 
-    enum DoThread{
-        InitialClass
-    };
 
 signals:
     void uidChanged();
     void initialSignal();
     void limitChanged();
-
-    void doThread(QFetionStoreSMS::DoThread id);
 
 public slots:
     void queryMessages();
@@ -85,43 +78,28 @@ private:
      QSqlQuery  query;
      QString    uid;
      int        limit;
-     bool    isInitialed;
-
-     void initialClass();
-
      QFetionStoreSMSThread *smsThread;
-     friend class QFetionStoreSMSThread;
+
 };
+
 class QFetionStoreSMSThread:public QThread{
     Q_OBJECT
 public:
-   // NumThread(QObject *parent=0):QThread(parent){}
-    QFetionStoreSMSThread(QFetionStoreSMS *p_storesms):QThread(0){storesms= p_storesms;mutex.lock();}
+    // NumThread(QObject *parent=0):QThread(parent){}
+    QFetionStoreSMSThread(QFetionStoreSMS *p_storesms):QThread(0){storesms= p_storesms;}
+    /*
     void run(){
-        forever{
-            waitCondition.wait(&mutex);
-            QFetionStoreSMS::DoThread id = threadid;
-            switch(id){
-            case QFetionStoreSMS::InitialClass:
-                storesms->initialClass();
-                break;
-            }
-        }
+        qDebug() << "begin messageManager";
+        messageManager = new QMessageManager(this);
+        connect(messageManager,SIGNAL(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)),storesms,SLOT(messageAdded(QMessageId,QMessageManager::NotificationFilterIdSet)));
+        messageManager->registerNotificationFilter(QMessageFilter());
+        qDebug() <<"end messageMangager";
     };
-
-public slots:
-    void doThread(QFetionStoreSMS::DoThread id ){
-        threadid = id;
-        waitCondition.wakeAll();
-    }
-
+    */
 
 private:
-    QFetionStoreSMS::DoThread threadid;
-    QFetionStoreSMS* storesms;
-    QWaitCondition waitCondition;
-    QMutex mutex;
+    QFetionStoreSMS *storesms;
+    QMessageManager *messageManager;
 };
-
 
 #endif // QFETIONSTORESMS_H

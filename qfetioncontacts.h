@@ -103,7 +103,6 @@ public:
     };
 
     enum DoThread{
-        InitialContacts,
         SyncContacts
     };
 
@@ -132,9 +131,6 @@ protected:
         return ret;
 
     }
-
-    void initial_contacts();
-
 
 signals:
     void groupShowChanged(int groupid);
@@ -178,8 +174,6 @@ public:
             case QFetionContacts::SyncContacts:
                 contacts->sync_contacts();
                 break;
-            case QFetionContacts::InitialContacts:
-                contacts->initial_contacts();
             }
         }
     };
