@@ -16,6 +16,7 @@ Page{
     property string accountName
     property string server  : "http://202.112.3.1/sms/sendsms.php"
 
+
     Component.onCompleted:
     {
         phonenumber = contacts.mobileno;
@@ -274,14 +275,13 @@ Page{
     Menu {
         id: colorMenu
         visualParent: pageStack
-
         MenuLayout {
             MenuItem {
                 text: "Set Theme inverted";
                 onClicked: theme.inverted = !theme.inverted
             }
-            MenuItem {text: "Add Contact";
-                onClicked:pageStack.push(Qt.createComponent("AddContact.qml"))
+            MenuItem {text: "Lock Orientation";
+                onClicked:screen.allowedOrientations = Screen.Portrait;
             }
             MenuItem {text: "Sync Contacts";
                 onClicked: {

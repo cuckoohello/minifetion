@@ -45,7 +45,7 @@ void QFetionContacts::initial_contacts()
     if(!query.exec("select * from groups order by groupid"))
         qDebug() <<"Select from groups error!";
 
-    beginResetModel();
+  //  beginResetModel();
     while(query.next())
     {
         groupId = query.value(0).toInt();
@@ -64,7 +64,7 @@ void QFetionContacts::initial_contacts()
                                                queryContacts.value(4).toString(),groupId));
         }
     }
-    endResetModel();
+  //  endResetModel();
 
     connect(this,SIGNAL(groupShowChanged(int)),this,SLOT(groupStateChanged(int)));
 }
