@@ -20,10 +20,6 @@ Page{
 
     orientationLock : PageOrientation.LockPortrait
 
-    function showInfoBanner(){
-        smsStatusBanner.forceActiveFocus();
-        smsStatusBanner.show();
-    }
 
     function  initial(){
         fetionSMSModel.initial();
@@ -32,18 +28,6 @@ Page{
     function  updateMessage(id,state)
     {
         fetionSMSModel.upDateMessage(id,state);
-    }
-
-
-    InfoBanner{
-        id: smsStatusBanner
-        text:personSMS.smsInfo
-        timerEnabled:true
-        timerShowTime:3000
-        topMargin: parent.height/3
-        z : smsList.z + 1
-       // leftMargin:
-
     }
 
 

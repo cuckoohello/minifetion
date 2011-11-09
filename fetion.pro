@@ -65,7 +65,11 @@ OTHER_FILES += \
     qml/fetion/AddContact.qml \
     qml/fetion/AccTitleBar.qml \
     qml/fetion/AccountSetting.qml \
-    qml/fetion/AccListSina.qml
+    qml/fetion/AccListSina.qml \
+    qml/fetion/MyDialog.qml \
+    qml/fetion/Popup.qml \
+    qml/fetion/Fader.qml \
+    qml/fetion/tmp.qml
 
 HEADERS += \
     qfetionsms.h \
@@ -86,5 +90,9 @@ contains(MEEGO_EDITION,harmattan) {
 
     INSTALLS += target icon desktop
 }
+
+
+
+
 
 

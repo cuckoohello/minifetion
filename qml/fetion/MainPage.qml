@@ -27,15 +27,22 @@ Page{
 
     FetionContacts{
         id : contacts
+        property bool needAuth
+        property bool isSyncContacts : false
+
         onContacts_Count_Changed:{
             progressBar.indeterminate = false;
         }
         onSync_contacts_finished:{
             contactStatusDialog.close();
+            contacts.isSyncContacts = false;
+        }
+        onSync_Need_Auth:{
+            needAuth = true;
         }
     }
 
-    Dialog {
+    MyDialog {
            id: contactStatusDialog
            anchors.centerIn: parent
            title: Item {
@@ -64,8 +71,11 @@ Page{
 
            content: Item {
                width: parent.width
+               height: childrenRect.height
                ProgressBar {
                    id: progressBar
+                   anchors.top: parent.top
+                   anchors.topMargin: 10
                    width: parent.width
                    minimumValue: 0
                    maximumValue : contacts.total_contacts_count
@@ -82,15 +92,58 @@ Page{
                    verticalAlignment: Text.AlignVCenter
                }
 
+               Image{
+                   id : authImage
+                   anchors.top: text.bottom
+                   anchors.topMargin : 10
+                   anchors.horizontalCenter: parent.horizontalCenter
+                   source: "file:/home/user/.fetion/code.jpeg"
+                   width: 180
+                   height: contacts.needAuth ? 72 : 0
+                   fillMode:Image.Stretch
+                   visible: contacts.needAuth
+               }
+               TextField{
+                   id : authCode
+                   anchors.top: authImage.bottom
+                   anchors.topMargin: 10
+                   width: parent.width
+                   visible: contacts.needAuth
+                   height: contacts.needAuth ? 52 : 0
+               }
+               Item {
+                   height: 15
+                   anchors.top: authCode.bottom
+               }
            }
+
+           buttons: ButtonRow {
+               platformStyle: ButtonStyle { }
+               anchors.horizontalCenter: parent.horizontalCenter
+               Button {
+                   id: b1;
+                   text: "OK";
+                   visible:contacts.needAuth;enabled:authCode.text != "";
+                   onClicked: {contacts.setAuthCode(authCode.text); contacts.needAuth = false;}
+                   }
+               Button {id: b2; text: "Hide"; onClicked: contactStatusDialog.close()}
+           }
+
    }
 
 
     function syncContacts(phonenumber,password)
     {
-	progressBar.indeterminate = true;
-        contactStatusDialog.open();
-        contacts.sync_contacts(phonenumber,password);
+        if (contacts.isSyncContacts)
+            contactStatusDialog.open();
+        else
+        {
+            progressBar.indeterminate = true;
+            contacts.needAuth = false;
+            contacts.isSyncContacts = true;
+            contactStatusDialog.open();
+            contacts.sync_contacts(phonenumber,password);
+        }
     }
 
     function sendSMS(sendto,messageid,cellphone,message)
@@ -100,29 +153,20 @@ Page{
 
     function  callback(status,sendto,id,log)
     {
+        var text;
         if (status !== 200)
-            smsStatusBanner.text = "Send to "+sendto+" network error!";
+            text = "Send to "+sendto+" network error!";
         else
-            smsStatusBanner.text = "Send to "+sendto+" "+log;
-        personSMSPage.smsInfo = smsStatusBanner.text;
+            text = "Send to "+sendto+" "+log;
         if(log ==="Success")
             personSMSPage.updateMessage(id,1);
         else
             personSMSPage.updateMessage(id,3);
 
         console.log(smsStatusBanner.text);
-        smsStatusBanner.show();
-        personSMSPage.showInfoBanner();
+        mainWindow.showBanner(text);
     }
 
-    InfoBanner{
-        id: smsStatusBanner
-        timerEnabled:true
-        timerShowTime:3000
-        topMargin: parent.height/3
-        z : contactView.z + 1
-
-    }
 
 
 

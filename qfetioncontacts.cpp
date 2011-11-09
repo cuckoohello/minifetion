@@ -381,7 +381,7 @@ login:
                 setSyncStatusMessage("Getting code picture，please wait...");
                 generate_pic_code(user);
                 authCode = "";
-                emit sync_need_auth();
+                emit sync_Need_Auth();
                 waitCondition.wait(&mutex);
                 if (authCode=="")
                 {
@@ -480,7 +480,7 @@ auth:
                 setSyncStatusMessage("Getting code picture，please wait...");
                 generate_pic_code(user);
                 authCode = "";
-                emit sync_need_auth();
+                emit sync_Need_Auth();
                 waitCondition.wait(&mutex);
                 if (authCode=="")
                 {

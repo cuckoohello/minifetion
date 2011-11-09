@@ -151,7 +151,7 @@ signals:
     void presence_Count_Changed();
     void doThread(QFetionContacts::DoThread id);
     void sync_Status_Changed();
-    void sync_need_auth();
+    void sync_Need_Auth();
 
 public slots:
     void groupStateChanged(int groupid);
