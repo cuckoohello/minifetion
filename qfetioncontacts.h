@@ -52,9 +52,9 @@ class QFetionContacts : public QAbstractListModel,public QDeclarativeParserStatu
     Q_OBJECT
     Q_INTERFACES(QDeclarativeParserStatus)
 
-    Q_PROPERTY(QString nickname READ getNickname)
-    Q_PROPERTY(QString  password READ getPassword)
-    Q_PROPERTY(QString  mobileno READ  getMobileNo)
+    Q_PROPERTY(QString nickname READ getNickname NOTIFY nicknameChanged)
+    Q_PROPERTY(QString  password READ getPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString  mobileno READ  getMobileNo NOTIFY mobilenoChanged)
     Q_PROPERTY(int total_contacts_count READ getTotalContactsCount NOTIFY contacts_Count_Changed);
     Q_PROPERTY(int presence_contacts_count READ getPresenceCount NOTIFY presence_Count_Changed);
     Q_PROPERTY(QString sync_status_message READ getSyncStatusMessage NOTIFY sync_Status_Changed);
@@ -101,6 +101,8 @@ public:
         waitCondition.wakeAll();
     }
 
+    void reloadContacts();
+
     enum Roles {
         NameRole = Qt::DisplayRole,
         MobileRole,
@@ -138,6 +140,8 @@ protected:
         int ret = fx_login(sync_mobileno.toUtf8().data(),sync_password.toUtf8().data());
         if (ret)
             sleep(1); // for user to navigate the error!
+        else
+            reloadContacts();
         emit sync_contacts_finished(ret);
         qDebug() <<"Sync ended!";
         return ret;
@@ -152,6 +156,9 @@ signals:
     void doThread(QFetionContacts::DoThread id);
     void sync_Status_Changed();
     void sync_Need_Auth();
+    void passwordChanged();
+    void nicknameChanged();
+    void mobilenoChanged();
 
 public slots:
     void groupStateChanged(int groupid);

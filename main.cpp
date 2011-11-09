@@ -7,6 +7,7 @@
 #include "qfetionstoresms.h"
 #include "fpsdeclarativeview.h"
 #include <QDir>
+#include <QFile>
 //#include "qfetionnetwork.h"
 
 #include <QSqlDatabase>
@@ -15,6 +16,17 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("/home/user/.fetion/data.db");
+
+    QFile file("/home/user/.fetion/data.db");
+    if (!file.exists())
+    {
+        QDir dir("/home/user/.fetion");
+        if (!dir.exists())
+            dir.mkpath("/home/user/.fetion");
+        file.open(QIODevice::WriteOnly);
+        file.close();
+    }
+
     if (!db.open()) {
         qDebug()  <<"Sql open error!\n";
     }

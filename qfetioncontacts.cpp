@@ -22,8 +22,14 @@ QFetionContacts::QFetionContacts(QObject *parent) :
     contactThread->start();
     mutex.lock();
 
+    connect(this,SIGNAL(groupShowChanged(int)),this,SLOT(groupStateChanged(int)));
+
+    reloadContacts();
+}
+void QFetionContacts::reloadContacts(){
     QSqlQuery query;
     QSqlQuery queryContacts;
+
 
     if(!query.exec("select mobileno,password,nickname from user"))
         qDebug() << "Get user information error!";
@@ -33,7 +39,13 @@ QFetionContacts::QFetionContacts(QObject *parent) :
         nickname = query.value(2).toString();
         password = query.value(1).toString();
         mobileno = query.value(0).toString();
+
+        emit passwordChanged();
+        emit nicknameChanged();
+        emit mobilenoChanged();
     }
+
+    beginResetModel();
 
     int groupId;
     if(!query.exec("select * from groups order by groupid"))
@@ -57,8 +69,7 @@ QFetionContacts::QFetionContacts(QObject *parent) :
                                                    queryContacts.value(4).toString(),groupId));
         }
     }
-
-    connect(this,SIGNAL(groupShowChanged(int)),this,SLOT(groupStateChanged(int)));
+    endResetModel();
 
 }
 
@@ -378,7 +389,7 @@ login:
         if(USER_AUTH_NEED_CONFIRM(user)){
                 debug_info(user->verification->text);
                 debug_info(user->verification->tips);
-                setSyncStatusMessage("Getting code picture，please wait...");
+                setSyncStatusMessage("Getting code picture,please wait...");
                 generate_pic_code(user);
                 authCode = "";
                 emit sync_Need_Auth();

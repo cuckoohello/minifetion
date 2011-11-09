@@ -10,20 +10,11 @@ import "constants.js" as UI
 Page{
     id : mainPage
     anchors.fill : parent
-
-    property string phonenumber
-    property string password
-    property string accountName
+    property alias phonenumber: contacts.mobileno
+    property alias password : contacts.password
+    property alias accountName : contacts.nickname
     property string server  : "http://202.112.3.1/sms/sendsms.php"
     orientationLock : PageOrientation.LockPortrait
-
-
-    Component.onCompleted:
-    {
-        phonenumber = contacts.mobileno;
-        password    = contacts.password;
-        accountName = contacts.nickname;
-    }
 
     FetionContacts{
         id : contacts
@@ -39,11 +30,13 @@ Page{
         }
         onSync_Need_Auth:{
             needAuth = true;
+            contactStatusDialog.imageSource = "file:/home/user/.fetion/code.jpeg";
         }
     }
 
     MyDialog {
            id: contactStatusDialog
+           property alias imageSource: authImage.source
            anchors.centerIn: parent
            title: Item {
                id: titleField
@@ -97,7 +90,6 @@ Page{
                    anchors.top: text.bottom
                    anchors.topMargin : 10
                    anchors.horizontalCenter: parent.horizontalCenter
-                   source: "file:/home/user/.fetion/code.jpeg"
                    width: 180
                    height: contacts.needAuth ? 72 : 0
                    fillMode:Image.Stretch
